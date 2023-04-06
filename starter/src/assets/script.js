@@ -1,5 +1,13 @@
 const products = [];
 
+/* 🚨 HELPER
+      FUNCTION
+   🚨
+*/
+function getProduct(productId, productList) {
+  return productList.find((item) => item.productId === productId);
+}
+// begin item objects
 const cherry = {
   name: "Cereza",
   price: 3.50,
@@ -31,6 +39,7 @@ const mango = {
   productId: 4,
   image: "./images/mango.jpg",
 };
+
 /* ################################################### 
         Begin addProductToCart Function
    ################################################### 
@@ -41,26 +50,15 @@ products.push(cherry, soursop, strawberry, mango);
 
 const cart = [];
 
-function addProductToCart(sku) {
-  // Find the product by SKU
-  const product = products.find((p) => p.productId === sku);
-
-  // Check if the product is already in the cart
-  const cartItem = cart.find((item) => item.productId === sku);
-
-  if (cartItem) {
-    cartItem.quantity++;
-  } else {
-    // Add the product to the cart with quantity of 1
-    cart.push({
-      productId: product.productId,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      image: product.image,
-    });
+function addProductToCart(productId) {
+  let itemA = getProduct(productId, cart);
+  let itemB = getProduct(productId, products);
+  if (productId === itemB.productId && itemA === itemB){
+    itemA.quantity++;
+  } else if (productId === itemB.productId) {
+    itemB.quantity++;
+    cart.push(itemB);
   }
-
 }
 /* ################################################### 
         Begin increaseQuantity Function
@@ -68,11 +66,9 @@ function addProductToCart(sku) {
 */
 function increaseQuantity(productId) {
   // Find the product in the cart by its productId
-  const product = cart.find((product) => product.productId === productId);
-
-  // Increase the quantity of the product in the cart by 1
-  product.quantity++;
-
+  let addToCart = getProduct(productId, cart);
+  // increment quantity of product in cart
+  addToCart.quantity++;
 }
 
 /* ################################################### 
@@ -80,21 +76,11 @@ function increaseQuantity(productId) {
    ################################################### 
 */
 function decreaseQuantity(productId) {
-  // Find the product in the cart by its productId
-  const productIndex = cart.findIndex(product => product.productId === productId);
-
-  // If the product exists in the cart
-  if (productIndex !== -1) {
-    const product = cart[productIndex];
-
-    // If the product quantity is greater than 1, decrease it by 1
-    if (product.quantity > 1) {
-      product.quantity--;
-    }
-    // Otherwise, remove the product from the cart
-    else {
-      cart.splice(productIndex, 1);
-    }
+  let decQty = getProduct(productId, cart);
+  if (decQty.quantity === 1) {
+    removeProductFromCart(productId);
+  } else {
+    decQty.quantity--;
   }
 }
 /* ################################################### 
@@ -103,10 +89,13 @@ function decreaseQuantity(productId) {
 */
 
 function removeProductFromCart(productId) {
- const productIndex = cart.findIndex((item) => item.productId === productId);
-
-  // remove product from cart
-  cart.splice(productIndex, 1);
+  cart.forEach((product, index) => {
+    if (product.productId === productId) {
+      // quantity update to zero
+      product.quantity = 0;
+      cart.splice(index, 1);
+    }
+  });
 }
 
 /* ################################################### 
